@@ -6,7 +6,7 @@ This repository contains all the source code, test code, documentation for the N
 Proper git etiquette shall be followed during the making of this project.
 
 The group members for this project are:
-    - @szymonmasternak
-    - @danchesko
+- @szymonmasternak
+- @danchesko
 
 This readme will be updated as the project progresses.
