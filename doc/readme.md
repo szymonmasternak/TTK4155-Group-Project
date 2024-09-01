@@ -1,0 +1,1 @@
+Usually datasheets, schematics and user guides shouldn't be kept on a git repository however, due to the nature of the project, those files will not change, therefore for the simplicity of access of everyone working on the project, they shall be placed in the project repository.
