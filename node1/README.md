@@ -1,0 +1,1 @@
+This folder contains all the code required for the 'Node 1' part of the project.
