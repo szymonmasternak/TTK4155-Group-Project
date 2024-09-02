@@ -1,7 +1,7 @@
 name: Node 1 CI
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Build_And_Save:
     runs-on: ubuntu-latest
     container:
       image: lpodkalicki/avr-toolchain
@@ -15,6 +15,6 @@ jobs:
       - name: Archive Node 1 Firmware
         uses: actions/upload-artifact@v4
         with:
-          name: Saving firmware artifacts
+          name: Node 1 Firmware
           path: |
             node1/build/main.hex
