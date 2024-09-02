@@ -12,7 +12,8 @@ jobs:
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - name: Check out repository code
         uses: actions/checkout@v4
-      - name: Run a command inside the container
-        run: |
-          echo "Inside Container"
-          ls -la
+      - name: Listing all files in cloned repository
+        run: ls -la
+      - name: Building Node 1 firmware
+        run: cd node1 && make
+      
