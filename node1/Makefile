@@ -1,5 +1,10 @@
 # List all source files to be compiled; separate with space
-SOURCE_FILES := main.c
+SOURCE_FILES := \
+	src/main.c \
+	src/application/test.c
+
+INCLUDE_PATHS := \
+	-Isrc/application
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes
@@ -13,31 +18,40 @@ endif
 BUILD_DIR := build
 TARGET_CPU := atmega162
 TARGET_DEVICE := m162
+HEX_FILENAME := main.hex
 
 CC := avr-gcc
-CFLAGS := -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
+CFLAGS := $(INCLUDE_PATHS) -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
 
-OBJECT_FILES = $(SOURCE_FILES:%.c=$(BUILD_DIR)/%.o)
+# Replaces .c to .o in filename, removes directory list and appends the build dir in front.
+# foo/bar.c -> foo/bar.o -> bar.o -> build/bar.o
+OBJECT_FILES = $(addprefix $(BUILD_DIR)/,$(notdir $(SOURCE_FILES:.c=.o)))
 
-.DEFAULT_GOAL := $(BUILD_DIR)/main.hex
+# Extracts directories from the list of source files and tells Makefile to look in those directories
+vpath %.c $(dir $(SOURCE_FILES))
+
+all: $(BUILD_DIR)/$(HEX_FILENAME)
 
 $(BUILD_DIR):
-	mkdir $(BUILD_DIR)
+	@mkdir $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "(CC) $<"
+	@$(CC) -c $(CFLAGS) $< -o $@
 
-$(BUILD_DIR)/main.hex: $(OBJECT_FILES) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(OBJECT_FILES) -o $(BUILD_DIR)/a.out
-	avr-objcopy -j .text -j .data -O ihex $(BUILD_DIR)/a.out $(BUILD_DIR)/main.hex
+$(BUILD_DIR)/$(HEX_FILENAME): $(OBJECT_FILES) | $(BUILD_DIR)
+	@echo "(CC) a.out"
+	@$(CC) $(CFLAGS) $(OBJECT_FILES) -o $(BUILD_DIR)/a.out
+	@echo "(CP) $(HEX_FILENAME)"
+	@avr-objcopy -j .text -j .data -O ihex $(BUILD_DIR)/a.out $(BUILD_DIR)/$(HEX_FILENAME)
 
 .PHONY: flash
-flash: $(BUILD_DIR)/main.hex
-	avrdude -p $(TARGET_DEVICE) -c $(PROGRAMMER) -U flash:w:$(BUILD_DIR)/main.hex:i
+flash: $(BUILD_DIR)/$(HEX_FILENAME)
+	avrdude -p $(TARGET_DEVICE) -c $(PROGRAMMER) -U flash:w:$(BUILD_DIR)/$(HEX_FILENAME):i
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)
 
 .PHONY: erase
 erase:
@@ -46,7 +60,7 @@ erase:
 .PHONY: debug
 debug:
 	if pgrep avarice; then pkill avarice; fi
-	avrdude -p $(TARGET_DEVICE) -c $(PROGRAMMER) -U flash:w:$(BUILD_DIR)/main.hex:i
+	avrdude -p $(TARGET_DEVICE) -c $(PROGRAMMER) -U flash:w:$(BUILD_DIR)/$(HEX_FILENAME):i
 	x-terminal-emulator -e avarice --edbg --ignore-intr :4242
 	sleep 2
 	avr-gdb -tui -iex "target remote localhost:4242" $(BUILD_DIR)/a.out
