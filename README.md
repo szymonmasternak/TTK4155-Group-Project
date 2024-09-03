@@ -9,5 +9,6 @@ The group members for this project are:
 
 - @szymonmasternak
 - @danchesko
+- @casvepp
 
 This readme will be updated as the project progresses.
