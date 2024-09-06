@@ -2,7 +2,6 @@
 #include "hal_uart.h"
 
 #include <avr/io.h>
-#include <util/delay.h>
 
 void HAL_UART0_Init(uint32_t baudrate){
     uint8_t ubrr = ((F_CPU / (16 * baudrate))-1);
