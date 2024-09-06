@@ -1,10 +1,12 @@
 # List all source files to be compiled; separate with space
 SOURCE_FILES := \
 	src/main.c \
-	src/application/test.c
+	src/hal/hal_uart.c
 
 INCLUDE_PATHS := \
-	-Isrc/application
+	-Isrc \
+	-Isrc/application \
+	-Isrc/hal
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes
