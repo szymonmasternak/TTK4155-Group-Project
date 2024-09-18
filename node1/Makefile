@@ -2,7 +2,10 @@
 SOURCE_FILES := \
 	src/main.c \
 	src/hal/hal_uart.c \
-	src/log/log.c
+	src/log/log.c \
+	src/hal/hal_gpio.c \
+	src/application/gpio.c \
+	src/application/sram.c
 
 INCLUDE_PATHS := \
 	-Isrc \
