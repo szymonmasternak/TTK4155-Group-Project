@@ -8,7 +8,8 @@ SOURCE_FILES := \
 	src/application/sram.c \
 	src/drivers/max156.c \
 	src/drivers/sn54als573.c \
-	src/drivers/joystick.c
+	src/drivers/joystick.c \
+	src/drivers/ssd1308.c
 
 INCLUDE_PATHS := \
 	-Isrc \
