@@ -17,6 +17,7 @@
 #include "ssd1308.h"
 
 #include <string.h>
+#include "display.h"
 
 void init_pwm(void) {
     //Page 95 of Datasheet
@@ -53,13 +54,10 @@ int main(void) {
     init_pwm();
 
     SSD1306_Init();
-    int i = 0;
-    while(1){
-        SSD1308_Reset();
-		SSD1308_SetCursor(0, 0);
-		char mystring[256] = {0};
-        memcpy(mystring, "Hello World!", strlen("Hello World!"));
+    SSD1308_Reset();
+    SSD1308_SetCursor(0, 0);
 
+    while(1){
         uint8_t adc_reading = MAX156_ReadData(MAX156_CHANNEL_0);
         uint8_t adc_reading1 = MAX156_ReadData(MAX156_CHANNEL_1);
         uint8_t adc_reading2 = MAX156_ReadData(MAX156_CHANNEL_2);
@@ -67,10 +65,21 @@ int main(void) {
         JOYSTICK_POS_t pos = JOYSTICK_GetAnalogPosition(adc_reading, adc_reading1);
         JOYSTICK_DIR_t dir = JOYSTICK_GetDirection(adc_reading, adc_reading1);
 
-        SSD1308_printf(SSD1306_FONT_MEDIUM, "Hello World %d", i);
-
+        switch(dir){
+            case JOYSTICK_DOWN:
+                DISPLAY_nextOption();
+                break;
+            case JOYSTICK_UP:
+                DISPLAY_previousOption();
+                break;
+            case JOYSTICK_RIGHT:
+                DISPLAY_selectOption();
+                break;
+            default:
+                break;
+        }
+        DISPLAY_renderMenu();
         printf("MAX156 CH0: %03d CH1: %03d CH2: %03d CH3: %03d JoystickPos: %02d, %02d JoystickDir: %s\n", adc_reading, adc_reading1, adc_reading2, adc_reading3, pos.x, pos.y, JOYSTICK_DIR_toString(dir));
-        i++;
         _delay_ms(500);
     }
 
