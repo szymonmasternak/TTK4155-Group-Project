@@ -5,13 +5,19 @@ SOURCE_FILES := \
 	src/log/log.c \
 	src/hal/hal_gpio.c \
 	src/application/gpio.c \
-	src/application/sram.c
+	src/application/sram.c \
+	src/drivers/max156.c \
+	src/drivers/sn54als573.c \
+	src/drivers/joystick.c \
+	src/drivers/ssd1308.c \
+	src/drivers/display.c
 
 INCLUDE_PATHS := \
 	-Isrc \
 	-Isrc/application \
 	-Isrc/hal \
-	-Isrc/log
+	-Isrc/log \
+	-Isrc/drivers
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes
