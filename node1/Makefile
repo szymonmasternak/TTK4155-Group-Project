@@ -10,7 +10,11 @@ SOURCE_FILES := \
 	src/drivers/sn54als573.c \
 	src/drivers/joystick.c \
 	src/drivers/ssd1308.c \
-	src/drivers/display.c
+	src/drivers/display.c \
+	src/hal/hal_spi.c \
+	src/drivers/mcp2515.c \
+	src/application/can.c \
+	src/application/clock.c
 
 INCLUDE_PATHS := \
 	-Isrc \

@@ -19,26 +19,11 @@
 #include <string.h>
 #include "display.h"
 
-void init_pwm(void) {
-    //Page 95 of Datasheet
-    //Max pwm freq => f_oc = f_clk_io / 2
-    //f_oc = f_clk_io / (2 * N * (1 + OCR1))
+#include "hal_spi.h"
+#include "mcp2515.h"
 
-    //Set PD5 as Output
-    DDRD |= (1 << PD5);
-
-    //Fast PWM no prescaler (N=1 from formulae above)
-    TCCR1A = (1 << COM1A1) | (1 << WGM11);
-    TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS10);
-
-    //Clock counts from 0-1
-    ICR1H = 0;
-    ICR1L = 1;
-
-    //50% duty cycle
-    OCR1AH = 0;
-    OCR1AL = 0;
-}
+#include "can.h"
+#include "clock.h"
 
 int main(void) {
     SRAM_Init();
@@ -47,15 +32,45 @@ int main(void) {
     LOG_Setup();
     GPIO_Init();
 
-    printf("Testing This Function %d\r\n", 8);
+    printf("Testing This Function %d\n", 8);
     SRAM_Test();
-    printf("Test Finished\r\n");
+    printf("Test Finished\n");
     
-    init_pwm();
+    CLOCK_Init();
 
     SSD1306_Init();
     SSD1308_Reset();
     SSD1308_SetCursor(0, 0);
+
+    printf("Initialising SPI/CAN\n");
+    HAL_SPI_Init();
+    MCP2515_Init();
+    MCP2515_SetMode(MODE_LOOPBACK);
+
+    CAN_Data_t sampleFrame;
+    sampleFrame.id = 321;  // Example CAN ID
+    sampleFrame.length = 8;  // Maximum data size
+    sampleFrame.data[0] = 11;
+    sampleFrame.data[1] = 22;
+    sampleFrame.data[2] = 33;
+    sampleFrame.data[3] = 44;
+    sampleFrame.data[4] = 55;
+    sampleFrame.data[5] = 66;
+    sampleFrame.data[6] = 77;
+    sampleFrame.data[7] = 88;
+    CAN_Transmit(&sampleFrame);
+    
+    //Wait for 100ms before retrieving frame
+    _delay_ms(100);
+
+    CAN_Data_t receiveFrame;
+    memset(&receiveFrame, 0, sizeof(receiveFrame));
+    CAN_Receive(&receiveFrame);
+
+    printf("Can ID:%d Len:%d\n", receiveFrame.id, receiveFrame.length);
+    for(uint8_t i=0; i<8; i++){
+        printf("data[%d]:%d\n", i, receiveFrame.data[i]);
+    }
 
     while(1){
         uint8_t adc_reading = MAX156_ReadData(MAX156_CHANNEL_0);
@@ -78,6 +93,11 @@ int main(void) {
             default:
                 break;
         }
+
+        if(HAL_GPIO_ReadPin(HAL_GPIO_PORT_B, HAL_GPIO_PIN_1) == HAL_GPIO_LOW){
+            printf("Joystick press\n");
+        }
+
         DISPLAY_renderMenu();
         printf("MAX156 CH0: %03d CH1: %03d CH2: %03d CH3: %03d JoystickPos: %02d, %02d JoystickDir: %s\n", adc_reading, adc_reading1, adc_reading2, adc_reading3, pos.x, pos.y, JOYSTICK_DIR_toString(dir));
         _delay_ms(500);
