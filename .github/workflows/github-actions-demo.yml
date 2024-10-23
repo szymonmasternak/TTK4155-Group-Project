@@ -1,7 +1,8 @@
 name: Node 1/2 CI
 on: [push]
+
 jobs:
-  Build_And_Save_Node1:
+  Build_And_Test_Node1:
     runs-on: ubuntu-latest
     container:
       image: lpodkalicki/avr-toolchain
@@ -12,12 +13,20 @@ jobs:
         run: ls -la
       - name: Building Node 1 firmware
         run: cd node1 && make
+      - name: Running Unit Tests for Node 1
+        run: cd node1 && make test
       - name: Archive Node 1 Firmware
         uses: actions/upload-artifact@v4
         with:
           name: Node 1 Firmware
           path: |
             node1/build/main.hex
+      - name: Archive Node 1 Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Node 1 Test Results
+          path: |
+            node1/build/test_results.txt
   Build_And_Save_Node2:
     runs-on: ubuntu-latest
     container:
