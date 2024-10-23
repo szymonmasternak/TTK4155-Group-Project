@@ -16,6 +16,11 @@ SOURCE_FILES := \
 	src/application/can.c \
 	src/application/clock.c
 
+TEST_SOURCE_FILES := \
+	tests/test_can.c \
+	tests/test_sram.c \
+	tests/unity/unity.c
+
 INCLUDE_PATHS := \
 	-Isrc \
 	-Isrc/application \
@@ -82,3 +87,14 @@ debug:
 	sleep 2
 	avr-gdb -tui -iex "target remote localhost:4242" $(BUILD_DIR)/a.out
 	killall -s 9 avarice	
+
+.PHONY: test
+test: $(TEST_OBJECT_FILES)
+	@echo "(CC) Running tests..."
+	@$(CC) $(CFLAGS) $(TEST_OBJECT_FILES) $(OBJECT_FILES) -o $(BUILD_DIR)/tests.out
+	@./$(BUILD_DIR)/tests.out
+
+# Test object files compilation
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	@echo "(CC) $<"
+	@$(CC) -c $(CFLAGS) $< -o $@
