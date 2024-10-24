@@ -1,5 +1,6 @@
 #include <avr/io.h> 
 #include "clock.h"
+#include "hal_gpio.h"
 
 void CLOCK_Init(void) {
     //Page 95 of Datasheet
@@ -7,7 +8,7 @@ void CLOCK_Init(void) {
     //f_oc = f_clk_io / (2 * N * (1 + OCR1))
 
     //Set PD5 as Output
-    DDRD |= (1 << PD5);
+    HAL_GPIO_ConfigPin(HAL_GPIO_PORT_D, HAL_GPIO_PIN_5, HAL_GPIO_CFG_OUTPUT);
 
     //Fast PWM no prescaler (N=1 from formulae above)
     TCCR1A = (1 << COM1A1) | (1 << WGM11);

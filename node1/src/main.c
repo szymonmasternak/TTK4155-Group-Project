@@ -25,6 +25,28 @@
 #include "can.h"
 #include "clock.h"
 
+#include "state.h"
+
+void processInterrupts(){
+    if(g_mcuState.interruptButtonL){
+        g_mcuState.interruptButtonL = 0;
+        printf("L Button\n");
+    }
+    if(g_mcuState.interruptButtonR){
+        g_mcuState.interruptButtonR = 0;
+        printf("R Button\n");
+    }
+    if(g_mcuState.interruptCAN){
+        g_mcuState.interruptCAN = 0;
+        printf("CAN Int\n");
+        uint8_t interruptFlags = MCP2515_ReadRegister(MCP_CANINTF);
+        if (interruptFlags & 0b00000001) {
+            MCP2515_WriteRegister(MCP_CANINTF, 0x00); //Clear The Interrupt
+        }        
+    }
+}
+
+
 int main(void) {
     SRAM_Init();
 
@@ -59,18 +81,6 @@ int main(void) {
     sampleFrame.data[6] = 77;
     sampleFrame.data[7] = 88;
     CAN_Transmit(&sampleFrame);
-    
-    //Wait for 100ms before retrieving frame
-    _delay_ms(100);
-
-    CAN_Data_t receiveFrame;
-    memset(&receiveFrame, 0, sizeof(receiveFrame));
-    CAN_Receive(&receiveFrame);
-
-    printf("Can ID:%d Len:%d\n", receiveFrame.id, receiveFrame.length);
-    for(uint8_t i=0; i<8; i++){
-        printf("data[%d]:%d\n", i, receiveFrame.data[i]);
-    }
 
     while(1){
         uint8_t adc_reading = MAX156_ReadData(MAX156_CHANNEL_0);
@@ -93,6 +103,8 @@ int main(void) {
             default:
                 break;
         }
+
+        processInterrupts();
 
         if(HAL_GPIO_ReadPin(HAL_GPIO_PORT_B, HAL_GPIO_PIN_1) == HAL_GPIO_LOW){
             printf("Joystick press\n");

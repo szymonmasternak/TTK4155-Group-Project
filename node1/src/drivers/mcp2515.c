@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "mcp2515.h"
 #include "hal_spi.h"
+#include "gpio.h"
 
 void MCP2515_Init(){
     MCP2515_SoftwareReset();
@@ -10,6 +11,10 @@ void MCP2515_Init(){
         printf("MCP2515 not in config!\n");
         return;
     }
+
+    //Enable CAN Interrupt on Message RX
+    MCP2515_WriteRegister(MCP_CANINTE, 0x01);
+    GPIO_EnableCANInterrupt();
 }
 
 uint8_t MCP2515_ReadRegister(uint8_t reg){

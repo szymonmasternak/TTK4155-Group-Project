@@ -14,7 +14,8 @@ SOURCE_FILES := \
 	src/hal/hal_spi.c \
 	src/drivers/mcp2515.c \
 	src/application/can.c \
-	src/application/clock.c
+	src/application/clock.c \
+	src/state.c
 
 INCLUDE_PATHS := \
 	-Isrc \
