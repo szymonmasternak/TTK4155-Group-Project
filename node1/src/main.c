@@ -42,7 +42,10 @@ void processInterrupts(){
         uint8_t interruptFlags = MCP2515_ReadRegister(MCP_CANINTF);
         if (interruptFlags & 0b00000001) {
             MCP2515_WriteRegister(MCP_CANINTF, 0x00); //Clear The Interrupt
-        }        
+        }
+        CAN_Receive(&g_mcuState.canData);
+        printf("CAN Data Received\n");
+        CAN_print(&g_mcuState.canData);
     }
 }
 
@@ -67,10 +70,9 @@ int main(void) {
     printf("Initialising SPI/CAN\n");
     HAL_SPI_Init();
     MCP2515_Init();
-    MCP2515_SetMode(MODE_LOOPBACK);
 
     CAN_Data_t sampleFrame;
-    sampleFrame.id = 321;  // Example CAN ID
+    sampleFrame.id = 0x24;  // Example CAN ID
     sampleFrame.length = 8;  // Maximum data size
     sampleFrame.data[0] = 11;
     sampleFrame.data[1] = 22;
@@ -111,8 +113,8 @@ int main(void) {
         }
 
         DISPLAY_renderMenu();
-        printf("MAX156 CH0: %03d CH1: %03d CH2: %03d CH3: %03d JoystickPos: %02d, %02d JoystickDir: %s\n", adc_reading, adc_reading1, adc_reading2, adc_reading3, pos.x, pos.y, JOYSTICK_DIR_toString(dir));
-        _delay_ms(500);
+        // printf("MAX156 CH0: %03d CH1: %03d CH2: %03d CH3: %03d JoystickPos: %02d, %02d JoystickDir: %s\n", adc_reading, adc_reading1, adc_reading2, adc_reading3, pos.x, pos.y, JOYSTICK_DIR_toString(dir));
+        // _delay_ms(500);
     }
 
     return 0;

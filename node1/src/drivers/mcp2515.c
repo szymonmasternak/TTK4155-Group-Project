@@ -12,9 +12,24 @@ void MCP2515_Init(){
         return;
     }
 
+    //250kbps CANBUS
+    #define BRP 1           //(16Mhz / (2 * 250kbps * 16)) - 1
+    #define SJW (4 - 1)     //SJW - 1
+    #define PROPAG (2 - 1)  //Propagation - 1
+    #define PHSEG1 (5 - 1)  //Phase1 - 1
+    #define PHSEG2 (8 - 1)  //Phase2 - 1
+    #define SAM 0           //Sampled Once
+    #define BTLMODE_REG 1   //ON or OFF
+
+    MCP2515_WriteRegister(MCP_CNF1, (SJW << 6) | (BRP));
+    MCP2515_WriteRegister(MCP_CNF2, (BTLMODE_REG << 7) | (SAM << 6) | (PHSEG1 << 3) | PROPAG);
+    MCP2515_WriteRegister(MCP_CNF3, PHSEG2);
+
     //Enable CAN Interrupt on Message RX
     MCP2515_WriteRegister(MCP_CANINTE, 0x01);
     GPIO_EnableCANInterrupt();
+
+    MCP2515_SetMode(MODE_NORMAL);
 }
 
 uint8_t MCP2515_ReadRegister(uint8_t reg){

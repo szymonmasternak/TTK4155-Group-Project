@@ -14,7 +14,7 @@
 #define MCP_RXB0D0   0b01100110
 
 void CAN_Transmit(CAN_Data_t *data){
-    if (data == NULL) {
+    if(data == NULL) {
         return;
     }
 
@@ -22,7 +22,7 @@ void CAN_Transmit(CAN_Data_t *data){
     MCP2515_WriteRegister(MCP_TXB0SIDH, (data->id >> 3) & 0b11111111);
     MCP2515_WriteRegister(MCP_TXB0DLC, data->length & 0b00001111);
 
-    for (uint8_t i = 0; i < data->length; i++) {
+    for(uint8_t i = 0; i < data->length; i++) {
         MCP2515_WriteRegister(MCP_TXB0D0 + i, data->data[i]);
     }
 
@@ -40,7 +40,18 @@ void CAN_Receive(CAN_Data_t *data){
 
     data->length = MCP2515_ReadRegister(MCP_RXB0DLC) & 0b00001111;
 
-    for (uint8_t i = 0; i < data->length; i++) {
+    for(uint8_t i = 0; i < data->length; i++) {
         data->data[i] = MCP2515_ReadRegister(MCP_RXB0D0 + i);
     }
+}
+
+void CAN_print(CAN_Data_t *data){
+    if (data == NULL){
+        return;
+    }
+    printf("CANID:0x%03X|Data Len:%d|Data:", data->id, data->length);
+    for(uint8_t i = 0; i<data->length; i++){
+        printf(" 0x%02X", data->data[i]);
+    }
+    printf("\n");
 }

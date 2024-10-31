@@ -39,7 +39,7 @@ TARGET_DEVICE := m162
 HEX_FILENAME := main.hex
 
 CC := avr-gcc
-CFLAGS := $(INCLUDE_PATHS) -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
+CFLAGS := $(INCLUDE_PATHS) -Os -std=c11 -mmcu=$(TARGET_CPU) -ggdb
 
 # Replaces .c to .o in filename, removes directory list and appends the build dir in front.
 # foo/bar.c -> foo/bar.o -> bar.o -> build/bar.o
