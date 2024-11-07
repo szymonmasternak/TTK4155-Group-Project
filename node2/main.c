@@ -34,10 +34,12 @@ int main()
     CanMsg messageRX = {0};
 
     while (1){
+        printf("here\n");
         delay(10000);
         printf("Sending CAN Pckt\n");
         can_tx(messageTX);
         if(can_rx(&messageRX) == 1){
+            printf("Received message!\n");
             can_printmsg(messageRX);
         };
     }

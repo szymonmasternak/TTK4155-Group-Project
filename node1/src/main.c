@@ -112,9 +112,16 @@ int main(void) {
             printf("Joystick press\n");
         }
 
+        memset(&sampleFrame, 0, sizeof(sampleFrame));
+        sampleFrame.length = 2;
+        sampleFrame.id = 0x24;
+        sampleFrame.data[0] = pos.x;
+        sampleFrame.data[1] = pos.y;
+        CAN_Transmit(&sampleFrame);
+
         DISPLAY_renderMenu();
         // printf("MAX156 CH0: %03d CH1: %03d CH2: %03d CH3: %03d JoystickPos: %02d, %02d JoystickDir: %s\n", adc_reading, adc_reading1, adc_reading2, adc_reading3, pos.x, pos.y, JOYSTICK_DIR_toString(dir));
-        // _delay_ms(500);
+        _delay_ms(500);
     }
 
     return 0;
