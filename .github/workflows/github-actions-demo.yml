@@ -1,7 +1,7 @@
-name: Node 1 CI
+name: Node 1/2 CI
 on: [push]
 jobs:
-  Build_And_Save:
+  Build_And_Save_Node1:
     runs-on: ubuntu-latest
     container:
       image: lpodkalicki/avr-toolchain
@@ -18,3 +18,20 @@ jobs:
           name: Node 1 Firmware
           path: |
             node1/build/main.hex
+  Build_And_Save_Node2:
+    runs-on: ubuntu-latest
+    container:
+      image: dataspeedinc/gcc-arm-none-eabi
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Listing all files in cloned repository
+        run: ls -la
+      - name: Building Node 2 firmware
+        run: cd node2 && make
+      - name: Archive Node 2 Firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: Node 2 Firmware
+          path: |
+            node2/build/main.elf

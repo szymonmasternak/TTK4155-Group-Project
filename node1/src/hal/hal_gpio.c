@@ -16,3 +16,11 @@ void HAL_GPIO_WritePin(HAL_GPIO_PORT_t port, HAL_GPIO_PIN_t pin, HAL_GPIO_STATE_
     else
         *(volatile uint8_t*)port &= ~(1 << pin);
 }
+
+HAL_GPIO_STATE_t HAL_GPIO_ReadPin(HAL_GPIO_PORT_t port, HAL_GPIO_PIN_t pin){
+    // PIN register of any PORT is offset by -2
+    if (*(volatile uint8_t*)(port - 2) & (1 << pin))
+        return HAL_GPIO_HIGH;
+    else
+        return HAL_GPIO_LOW;
+}

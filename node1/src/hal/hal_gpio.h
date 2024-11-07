@@ -31,3 +31,4 @@ typedef enum{
 
 void HAL_GPIO_ConfigPin(HAL_GPIO_PORT_t port, HAL_GPIO_PIN_t pin, HAL_GPIO_CFG_t cfg);
 void HAL_GPIO_WritePin(HAL_GPIO_PORT_t port, HAL_GPIO_PIN_t pin, HAL_GPIO_STATE_t state);
+HAL_GPIO_STATE_t HAL_GPIO_ReadPin(HAL_GPIO_PORT_t port, HAL_GPIO_PIN_t pin);

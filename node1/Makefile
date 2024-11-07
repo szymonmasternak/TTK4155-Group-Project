@@ -5,13 +5,24 @@ SOURCE_FILES := \
 	src/log/log.c \
 	src/hal/hal_gpio.c \
 	src/application/gpio.c \
-	src/application/sram.c
+	src/application/sram.c \
+	src/drivers/max156.c \
+	src/drivers/sn54als573.c \
+	src/drivers/joystick.c \
+	src/drivers/ssd1308.c \
+	src/drivers/display.c \
+	src/hal/hal_spi.c \
+	src/drivers/mcp2515.c \
+	src/application/can.c \
+	src/application/clock.c \
+	src/state.c
 
 INCLUDE_PATHS := \
 	-Isrc \
 	-Isrc/application \
 	-Isrc/hal \
-	-Isrc/log
+	-Isrc/log \
+	-Isrc/drivers
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes
@@ -28,7 +39,7 @@ TARGET_DEVICE := m162
 HEX_FILENAME := main.hex
 
 CC := avr-gcc
-CFLAGS := $(INCLUDE_PATHS) -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
+CFLAGS := $(INCLUDE_PATHS) -Os -std=c11 -mmcu=$(TARGET_CPU) -ggdb
 
 # Replaces .c to .o in filename, removes directory list and appends the build dir in front.
 # foo/bar.c -> foo/bar.o -> bar.o -> build/bar.o
