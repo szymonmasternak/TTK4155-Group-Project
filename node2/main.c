@@ -40,7 +40,7 @@ void PWM_Init(void) {
 }
 
 void PWM_SetDutyCycle(uint32_t dutycycle){
-    if (dutycycle >= 900 || dutycycle <= 2100)
+    if (dutycycle >= 900 && dutycycle <= 2100)
         PWM->PWM_CH_NUM[1].PWM_CDTY = dutycycle;
 }
 
