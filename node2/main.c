@@ -44,6 +44,34 @@ void PWM_SetDutyCycle(uint32_t dutycycle){
         PWM->PWM_CH_NUM[1].PWM_CDTY = dutycycle;
 }
 
+void ADC_Init(){
+    //Enable Clock for ADC in PMC
+    PMC->PMC_PCER1 |= 1 << (ID_ADC - 32);
+
+    //ADCClock = MCK / ( (PRESCAL+1) * 2 )
+    ADC->ADC_MR = ADC_MR_PRESCAL((84/2)-1) | ADC_MR_LOWRES_BITS_12 | ADC_MR_SLEEP_NORMAL | ADC_MR_FWUP_OFF | ADC_MR_FREERUN_ON;
+    //PA16 is ADC Channel 7 - Section 9.3.1 (PA16 SPCK1 TD AD7)
+    ADC->ADC_CHER = ADC_CHER_CH7;
+    ADC->ADC_CR = ADC_CR_START;
+}
+
+uint16_t ADC_Read(){
+    return ADC->ADC_CDR[7] & 0b111111111111;
+}
+
+uint16_t SERVO_ConvertJoystickValToPWM(int8_t x) {
+    #define JOYSTICK_MIN -128
+    #define JOYSTICK_MAX 127
+    #define SERVO_MIN 900
+    #define SERVO_MAX 2100
+
+    float scale = (float)(SERVO_MAX - SERVO_MIN)/(float)(JOYSTICK_MAX - JOYSTICK_MIN);
+    float offset = SERVO_MIN - (scale * JOYSTICK_MIN);
+
+    return (uint16_t)(scale * x + offset);
+}
+
+
 int main()
 {
     SystemInit();
@@ -56,6 +84,7 @@ int main()
 
     PWM_Init();
     PWM_SetDutyCycle(1500);
+    ADC_Init();
     
     can_init((CanInit){.brp = 20, .phase1 = 3, .phase2 = 7, .propag = 2, .sjw = 3}, 0);
     
@@ -65,21 +94,25 @@ int main()
         .byte[0] = 99,
     };
     CanMsg messageRX = {0};
+    int score = 0;
 
-    uint16_t i = 900;
     while (1){
-        printf("here\n");
-        delay(10000);
-        printf("Sending CAN Pckt\n");
-        can_tx(messageTX);
+        // printf("here\n");
+        // delay(10000);
+        // printf("Sending CAN Pckt\n");
+        // can_tx(messageTX);
         if(can_rx(&messageRX) == 1){
-            printf("Received message!\n");
-            can_printmsg(messageRX);
+            int8_t data = (int8_t) messageRX.byte[0];
+            uint16_t j = SERVO_ConvertJoystickValToPWM(data);
+            printf("Byte[0]: %d, Byte[1]: %d Servo: %d\n", (int8_t) messageRX.byte[0], (int8_t) messageRX.byte[1], j);
+            PWM_SetDutyCycle(j);
         };
-        PWM_SetDutyCycle(i);
-        i = i + 100;
-        if(i > 2100)
-            i = 900;
+        if(ADC_Read() < 800){
+            score++;
+            printf("Score Increased to: %d!!\n", score);
+            delay(5000);
+        }
+
     }
     
 }

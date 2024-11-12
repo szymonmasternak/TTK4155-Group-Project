@@ -114,14 +114,15 @@ int main(void) {
 
         memset(&sampleFrame, 0, sizeof(sampleFrame));
         sampleFrame.length = 2;
-        sampleFrame.id = 0x24;
+        sampleFrame.id = 0x1;
         sampleFrame.data[0] = pos.x;
         sampleFrame.data[1] = pos.y;
         CAN_Transmit(&sampleFrame);
+        printf("%d %d\n", pos.x, pos.y);
 
         DISPLAY_renderMenu();
         // printf("MAX156 CH0: %03d CH1: %03d CH2: %03d CH3: %03d JoystickPos: %02d, %02d JoystickDir: %s\n", adc_reading, adc_reading1, adc_reading2, adc_reading3, pos.x, pos.y, JOYSTICK_DIR_toString(dir));
-        _delay_ms(500);
+        _delay_ms(200);
     }
 
     return 0;

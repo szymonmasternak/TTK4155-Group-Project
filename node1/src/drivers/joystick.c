@@ -47,8 +47,20 @@ JOYSTICK_POS_t JOYSTICK_GetAnalogPosition(uint8_t joystickX, uint8_t joystickY){
 
     JOYSTICK_POS_t res;
 
-    res.x = (int8_t)(((int32_t)(joystickX - JOYSTICK_MIDPOINT_X) * 100) / (JOYSTICK_MAX_VALUE - JOYSTICK_MIDPOINT_X));
-    res.y = (int8_t)(((int32_t)(joystickY - JOYSTICK_MIDPOINT_Y) * 100) / (JOYSTICK_MAX_VALUE - JOYSTICK_MIDPOINT_Y));
+    int32_t temp_x = ((int32_t)(joystickX - JOYSTICK_MIDPOINT_X) * 100) / (JOYSTICK_MAX_VALUE - JOYSTICK_MIDPOINT_X);
+    int32_t temp_y = ((int32_t)(joystickY - JOYSTICK_MIDPOINT_Y) * 100) / (JOYSTICK_MAX_VALUE - JOYSTICK_MIDPOINT_Y);
+
+    if (temp_x > 127)
+        temp_x = 127;
+    if (temp_x < -128)
+        temp_x = -128;
+    if (temp_y > 127)
+        temp_y = 127;
+    if (temp_y < -128)
+        temp_y = -128;
+
+    res.x = (int8_t)temp_x;
+    res.y = (int8_t)temp_y;
 
     return res;
 }
